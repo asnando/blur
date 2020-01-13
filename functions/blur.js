@@ -6,10 +6,24 @@ const { log: print } = console;
 
 const isUrl = (url) => /^https?:\/{2}/.test(url);
 
-exports.handler = async function blur(event) {
-  const imageUrl = event.queryStringParameters.image;
+const getParam = (request, name, defaultValue) => {
+  const {
+    params: reqParams,
+    body,
+    query,
+  } = request;
+  const params = {
+    ...reqParams,
+    ...body,
+    ...query,
+  };
+  return params[name] || defaultValue;
+};
+
+async function blur(req) {
+  const imageUrl = getParam(req, 'image');
   // eslint-disable-next-line radix
-  const blurFactor = parseInt(event.queryStringParameters.blur) || 5;
+  const blurFactor = parseInt(getParam(req, 'blur', 5));
   if (!isUrl(imageUrl)) {
     return {
       statusCode: 400,
@@ -19,10 +33,13 @@ exports.handler = async function blur(event) {
   try {
     const image = await jimp.read(imageUrl);
     image.blur(blurFactor);
-    const imageAsBase64 = await image.getBase64Async(imageFormat);
+    const imageBuffer = await image.getBufferAsync(imageFormat);
     return {
       statusCode: 200,
-      body: imageAsBase64,
+      headers: {
+        'Content-Type': imageFormat,
+      },
+      body: imageBuffer,
     };
   } catch (exception) {
     print(exception);
@@ -32,3 +49,5 @@ exports.handler = async function blur(event) {
     };
   }
 };
+
+module.exports = blur;

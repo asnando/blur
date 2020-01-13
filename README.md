@@ -3,14 +3,14 @@
 
 ## Usage
 ```bash
-curl https://image-blur.netlify.com/.netlify/functions/blur?image=$image_url
+curl https://serverless-blur.herokuapp.com?image=$image_url
 ```
 
 ### Params
 
 <b>image</b> `required`
 
-The url of the image that will be blured. It will be returned as `base64` string as [Netlify](https://netlify.com) serverless functions only accepts to return text types.
+The url of the image that will be blured.
 
 <b>blur</b>
 
