@@ -2,7 +2,7 @@ const jimp = require('jimp');
 
 const imageFormat = jimp.MIME_PNG;
 
-// const { log: print } = console;
+const { log: print } = console;
 
 const isUrl = (url) => /^https?:\/{2}/.test(url);
 
@@ -16,11 +16,19 @@ exports.handler = async function blur(event) {
       body: 'Invalid url format',
     };
   }
-  const image = await jimp.read(imageUrl);
-  image.blur(blurFactor);
-  const imageAsBase64 = await image.getBase64Async(imageFormat);
-  return {
-    statusCode: 200,
-    body: imageAsBase64,
-  };
+  try {
+    const image = await jimp.read(imageUrl);
+    image.blur(blurFactor);
+    const imageAsBase64 = await image.getBase64Async(imageFormat);
+    return {
+      statusCode: 200,
+      body: imageAsBase64,
+    };
+  } catch (exception) {
+    print(exception);
+    return {
+      statusCode: 500,
+      body: 'Internal server error',
+    };
+  }
 };
